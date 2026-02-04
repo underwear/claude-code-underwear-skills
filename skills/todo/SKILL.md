@@ -48,6 +48,18 @@ When using `-R`, the `-d` flag sets when the first occurrence is due. If `-d` is
 
 All flags can be combined: `todocli new -l "Work" -r 9:00 -d tomorrow -I -R daily "Stand-up meeting"`
 
+### Subtasks (Checklist Items / Steps)
+
+```
+todocli new-step "list/task" "step text"          # Add a step to a task
+todocli list-steps "list/task"                     # Show steps of a task
+todocli complete-step "list/task" "step or index"  # Mark a step as checked
+todocli rm-step "list/task" "step or index"        # Remove a step
+todocli lst <list_name> -s                         # List tasks with their steps inline
+```
+
+Steps can be identified by name (string) or by index (number shown in `list-steps` output). All step commands support `-l`/`--list` flag.
+
 ## Task Format
 
 Tasks can be specified as:
