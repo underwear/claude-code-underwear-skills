@@ -1,8 +1,9 @@
 ---
 name: todo
-description: Manage Microsoft To Do tasks via todocli. Use when user wants to add, list, complete, or remove tasks.
+description: Manage Microsoft To Do tasks via todocli. Use when user wants to add, list, complete, remove tasks, or manage subtasks (steps/checklist items).
 user-invocable: true
 argument-hint: "[action or natural language request]"
+allowed-tools: Bash
 ---
 
 # Microsoft To Do Integration
