@@ -44,6 +44,8 @@ todocli new <task> -R "weekly:mon,fri"   # Repeat on specific days
 todocli new <task> -R "every 2 weeks"    # Custom interval
 ```
 
+When using `-R`, the `-d` flag sets when the first occurrence is due. If `-d` is omitted, it defaults to today. Example: `todocli new -R weekly -d tomorrow "Weekly review"`.
+
 All flags can be combined: `todocli new -l "Work" -r 9:00 -d tomorrow -I -R daily "Stand-up meeting"`
 
 ## Task Format
