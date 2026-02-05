@@ -51,14 +51,7 @@ Manage your Microsoft To Do tasks using natural language.
 
 #### Prerequisites
 
-1. Install [tod0](https://github.com/kiblee/tod0):
-   ```bash
-   pip install tod0
-   ```
-
-2. Register for an API key following [these instructions](https://github.com/kiblee/tod0/blob/master/GET_KEY.md)
-
-3. Run `tod0` once to complete authentication
+Install and configure [microsoft-todo-cli](https://github.com/underwear/microsoft-todo-cli) — see the repo README for setup instructions.
 
 #### Usage Examples
 
