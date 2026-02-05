@@ -1,94 +1,152 @@
 ---
 name: todo
-description: Manage Microsoft To Do tasks via todocli. Use when user wants to add, list, complete, remove tasks, or manage subtasks (steps/checklist items).
+description: Manage Microsoft To Do tasks. Use when user wants to add, list, complete, remove tasks, manage subtasks, or organize lists.
 user-invocable: true
 argument-hint: "[action or natural language request]"
 allowed-tools: Bash
 ---
 
-# Microsoft To Do Integration
+# Microsoft To Do CLI
 
-Manage tasks in Microsoft To Do using the `todocli` command-line tool.
+Manage tasks in Microsoft To Do using the `todo` command.
 
 ## User Request
 
 $ARGUMENTS
 
-## Available Commands (upstream)
+## Commands Reference
 
-These commands are available in the upstream version ([kiblee/tod0](https://github.com/kiblee/tod0)):
+### Tasks
 
-```
-todocli ls                      # List all task lists
-todocli lst <list_name>         # Show tasks in a list
-todocli new <task>              # Create a new task (format: "task name" or "list/task name")
-todocli new <task> -r <time>    # Create task with reminder
-todocli new <task> -l <list>    # Create task in a specific list (allows slashes in task name)
-todocli newl <list_name>        # Create a new list
-todocli complete <task>         # Mark task as completed
-todocli rm <task>               # Remove a task
-```
+```bash
+# List tasks
+todo tasks                        # Default list
+todo tasks Work                   # Specific list
+todo tasks --due-today            # Due today
+todo tasks --overdue              # Past due
+todo tasks --important            # High priority
+todo tasks --completed            # Done tasks
+todo tasks --all                  # Everything including completed
 
-## Extended Commands (fork)
+# Create task
+todo new "Task name"              # Basic task
+todo new "Task" -l Work           # In specific list
+todo new "Task" -d tomorrow       # With due date
+todo new "Task" -r 2h             # With reminder (in 2 hours)
+todo new "Task" -d mon -r 9am     # Due Monday, remind at 9am
+todo new "Task" -I                # Important (high priority)
+todo new "Task" -R daily          # Recurring daily
+todo new "Task" -R weekly:mon,fri # Recurring on specific days
+todo new "Task" -S "Step 1" -S "Step 2"  # With subtasks
 
-These flags are from the [underwear/tod0](https://github.com/underwear/tod0) fork. As of Feb 2026 they are not in the upstream repo — they may be merged in the future but this is not guaranteed. To verify which version is installed, run `pip show tod0` and check the source URL. If a flag is not recognized, fall back to the base commands above.
+# View single task
+todo show "Task"                  # Show task details
+todo show 0                       # Show by index
 
-```
-todocli new <task> -I                    # Mark task as important (high priority)
-todocli new <task> -d <date/time>        # Set due date
-todocli new <task> -R daily              # Repeat daily
-todocli new <task> -R weekly             # Repeat weekly
-todocli new <task> -R weekdays           # Repeat Mon-Fri
-todocli new <task> -R monthly            # Repeat monthly
-todocli new <task> -R yearly             # Repeat yearly
-todocli new <task> -R "weekly:mon,fri"   # Repeat on specific days
-todocli new <task> -R "every 2 weeks"    # Custom interval
-```
+# Update task
+todo update "Task" --title "New"  # Rename
+todo update "Task" -d friday -I   # Change due date, make important
 
-When using `-R`, the `-d` flag sets when the first occurrence is due. If `-d` is omitted, it defaults to today. Example: `todocli new -R weekly -d tomorrow "Weekly review"`.
+# Complete/Uncomplete
+todo complete "Task"              # Mark complete
+todo complete 0 1 2               # Complete by index (batch)
+todo uncomplete "Task"            # Reopen task
 
-All flags can be combined: `todocli new -l "Work" -r 9:00 -d tomorrow -I -R daily "Stand-up meeting"`
-
-### Subtasks (Checklist Items / Steps)
-
-```
-todocli new-step "list/task" "step text"          # Add a step to a task
-todocli list-steps "list/task"                     # Show steps of a task
-todocli complete-step "list/task" "step or index"  # Mark a step as checked
-todocli rm-step "list/task" "step or index"        # Remove a step
-todocli lst <list_name> -s                         # List tasks with their steps inline
+# Delete
+todo rm "Task"                    # Delete (asks confirmation)
+todo rm "Task" -y                 # Delete (no confirmation)
 ```
 
-Steps can be identified by name (string) or by index (number shown in `list-steps` output). All step commands support `-l`/`--list` flag.
+### Subtasks (Steps)
 
-## Task Format
+```bash
+todo new-step "Task" "Step text"      # Add step
+todo list-steps "Task"                # List steps
+todo complete-step "Task" "Step"      # Check off step
+todo uncomplete-step "Task" "Step"    # Uncheck step
+todo rm-step "Task" 0                 # Remove step by index
+```
 
-Tasks can be specified as:
-- `"task name"` — uses default list (Tasks)
-- `"list name/task name"` — specifies the list
-- Use `-l <list>` flag to specify list explicitly (allows task names with slashes, e.g. URLs)
+### Lists
 
-## Reminder / Due Date Format
+```bash
+todo lists                        # Show all lists
+todo new-list "Project X"         # Create list
+todo rename-list "Old" "New"      # Rename list
+todo rm-list "Project X"          # Delete list (asks confirmation)
+todo rm-list "Project X" -y       # Delete list (no confirmation)
+```
 
-- `1h`, `30m`, `1h30m` — relative time
-- `morning` — today/tomorrow at 7:00 AM
-- `evening` — today/tomorrow at 6:00 PM
-- `tomorrow` — tomorrow at 7:00 AM
-- `9:30`, `17:15` — specific time today/tomorrow
-- `9:30 am`, `10:15 pm` — 12-hour format
+## Task Identification
 
-## Recurrence Format (fork only)
+Tasks can be identified by **name**, **index**, or **ID**:
 
-- Presets: `daily`, `weekly`, `weekdays`, `monthly`, `yearly`
-- Custom intervals: `every 2 days`, `every 3 weeks`, `every 2 months`
-- Weekly with days: `weekly:mon,fri`, `every 2 weeks:mon,wed,fri`
-- Day abbreviations: `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`
+| Method | Example | Notes |
+|--------|---------|-------|
+| Name | `todo complete "Buy milk"` | First match wins if duplicates exist |
+| Index | `todo complete 0` | Unstable — changes as tasks are added/completed |
+| ID | `todo complete --id "AAMk..." -l Tasks` | Stable — requires `-l` flag |
+
+For automation, prefer `--id` with JSON output:
+```bash
+ID=$(todo new "Task" -l Work --json | jq -r '.id')
+todo complete --id "$ID" -l Work
+```
+
+## Date & Time Formats
+
+| Type | Examples |
+|------|----------|
+| Relative | `1h`, `30m`, `2d`, `1h30m` |
+| Time | `9:30`, `9am`, `17:00`, `5:30pm` |
+| Days | `tomorrow`, `monday`, `fri` |
+| Date | `2026-12-31`, `31.12.2026`, `12/31/2026` |
+| Keywords | `morning` (7:00), `evening` (18:00) |
+
+## Recurrence Patterns
+
+| Pattern | Description |
+|---------|-------------|
+| `daily` | Every day |
+| `weekly` | Every week |
+| `monthly` | Every month |
+| `yearly` | Every year |
+| `weekdays` | Monday to Friday |
+| `weekly:mon,wed,fri` | Specific days |
+| `every 2 days` | Custom interval |
+| `every 3 weeks` | Custom interval |
+
+When using `-R`, the `-d` flag sets the first occurrence. If omitted, defaults to today.
+
+## JSON Output
+
+Add `--json` to any command for machine-readable output:
+
+```bash
+todo tasks --json                 # List with full details
+todo show "Task" --json           # Single task details
+todo new "Task" --json            # Returns: {"action": "created", "id": "...", "title": "...", "list": "..."}
+todo complete "Task" --json       # Returns: {"action": "completed", ...}
+```
+
+With `--json`: stdout contains only valid JSON. Errors go to stderr. Exit code 0 = success, 1 = error.
+
+## Aliases
+
+| Alias | Command |
+|-------|---------|
+| `t` | `tasks` |
+| `n` | `new` |
+| `c` | `complete` |
+| `d` | `rm` |
+
+Example: `todo c 0` = `todo complete 0`
 
 ## Instructions
 
 1. Parse the user's natural language request
-2. Determine the appropriate todocli command
-3. Try extended flags first if they match the request; if the command fails with an unrecognized flag error, retry with base commands only
+2. Determine the appropriate `todo` command
+3. For delete operations, use `-y` flag to skip confirmation
 4. Execute the command
 5. Report the result clearly
 
