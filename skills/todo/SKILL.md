@@ -38,6 +38,7 @@ todo new "Task" -I --json                # Important (high priority)
 todo new "Task" -R daily --json          # Recurring daily
 todo new "Task" -R weekly:mon,fri --json # Recurring on specific days
 todo new "Task" -S "Step 1" -S "Step 2" --json  # With subtasks
+todo new "Task" -N "Note content" --json      # With note
 
 # View single task
 todo show "Task" --json                  # Show task details
