@@ -66,6 +66,16 @@ todo uncomplete-step "Task" "Step" --json    # Uncheck step
 todo rm-step "Task" 0 --json                 # Remove step by index
 ```
 
+### Notes
+
+```bash
+todo note "Task" "Note content"       # Add/update note
+todo show-note "Task"                 # Display note
+todo clear-note "Task"                # Remove note
+```
+
+Notes are text content attached to a task. Use `todo show "Task"` to see the note along with other task details.
+
 ### Lists
 
 ```bash
@@ -158,6 +168,8 @@ todo rm --id "AAMkADU3..." -l Tasks -y --json
 | `n` | `new` |
 | `c` | `complete` |
 | `d` | `rm` |
+| `sn` | `show-note` |
+| `cn` | `clear-note` |
 
 ## Instructions
 
