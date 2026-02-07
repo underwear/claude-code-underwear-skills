@@ -7,6 +7,7 @@ A collection of useful skills for [Claude Code](https://docs.anthropic.com/en/do
 | Skill | Description |
 |-------|-------------|
 | `/todo` | Manage Microsoft To Do tasks via natural language |
+| `/op` | Manage 1Password secrets (passwords, OTP codes, API keys) |
 
 ## Installation
 
@@ -73,6 +74,31 @@ Install and configure [microsoft-todo-cli](https://github.com/underwear/microsof
 - **Remove tasks** — delete tasks
 - **Create lists** — make new task lists
 
+### `/op` — 1Password Integration
+
+Manage 1Password secrets using natural language. Uses the `op` CLI with service account authentication.
+
+#### Prerequisites
+
+Install and configure [1Password CLI](https://developer.1password.com/docs/cli/get-started/) with a service account token.
+
+#### Usage Examples
+
+```
+/op list all items
+/op get password for GoDaddy
+/op show OTP for Laravel
+/op what vaults do I have
+```
+
+#### Supported Operations
+
+- **List items** — view all secrets in a vault
+- **Get credentials** — retrieve username, password, or other fields
+- **Get OTP codes** — fetch current TOTP 2FA codes
+- **Read secrets** — access individual field values
+- **List vaults** — discover available vaults
+
 ## Uninstall
 
 Remove individual skill:
@@ -85,7 +111,7 @@ Remove all skills from this collection:
 
 ```bash
 rm -rf ~/.claude/skills/todo
-# Add more as skills are added to this repo
+rm -rf ~/.claude/skills/op
 ```
 
 ## Adding New Skills
